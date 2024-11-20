@@ -2,13 +2,6 @@ import React from 'react'
 import { Box, Button, Container, Divider, FormControl, FormControlLabel, FormLabel, Link, styled, TextField, Typography, CardContent} from '@mui/material'
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import logo1 from "../Components/Asset/logo1.png"
-import { auth, db } from '../Firebase/Config';
-import { FacebookAuthProvider } from 'firebase/auth';
-import { signInWithPopup } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
-import { doc, setDoc } from 'firebase/firestore';
-import {Link as RouterLink} from "react-router-dom"
 
 const Card = styled(CardContent)(({ theme }) => ({
     display: 'flex',
@@ -30,56 +23,15 @@ const Card = styled(CardContent)(({ theme }) => ({
   }));
 
 export default function Login() {
-
-    const fbProvider = new FacebookAuthProvider();
-    const navigate = useNavigate();
-
-    const handleFacebookLogin = async () => {
-        try {
-            const { user } = await signInWithPopup(auth, fbProvider);
-            console.log({ user }); // Thông tin người dùng    
-
-            //Ghi thông tin người dùng vào Firestore
-            const userRef = doc(db, 'users', user.uid); // Lấy tham chiếu đến tài liệu
-            await setDoc(userRef, {
-                displayName: user.displayName,
-                email: user.email,
-                photoURL: user.photoURL,
-                providerId: user.providerData[0]?.providerId,
-                uid: user.uid,
-                createdAt: new Date(),
-            }, { merge: true }); // Sử dụng merge để không ghi đè dữ liệu cũ
-
-            console.log("Thông tin người dùng đã được lưu vào Firestore");
-            navigate('/'); // Chuyển hướng sau khi đăng nhập thành công
-        } catch (error) {
-            console.error('Error during Facebook login:', error); // Xử lý lỗi
-        }
-    };
-
-   
   return (
     <div className='backgroundLogin'>
         <Card>
-        <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-            <img 
-                src={logo1} 
-                alt='logo' 
-                style={{
-                    width: '100%', 
-                    maxWidth: '100px', // Thay đổi giá trị này theo nhu cầu
-                    height: 'auto'
-                }} 
-            />
-        </Box>
-
             <Typography
                 component='h1'
                 variant='h4'
                 sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-                
             >
-                Sign in
+                Sign Up
             </Typography>
             <Box
                 component='form'
@@ -90,6 +42,22 @@ export default function Login() {
                     gap: 2
                 }}
             >
+                <FormControl>
+                    <FormLabel>Full Name</FormLabel>
+                    <TextField
+                        id='fullName'
+                        type='text'
+                        name='fullName'
+                        placeholder='Mason Mouse'
+                        autoComplete='fullName'
+                        required
+                        fullWidth
+                        variant='outlined'
+                    >
+                        
+                    </TextField>
+                </FormControl>
+
                 <FormControl>
                     <FormLabel>Email</FormLabel>
                     <TextField
@@ -142,14 +110,13 @@ export default function Login() {
                 <Typography sx={{textAlign: 'center'}}>
                     Don't have an account? {' '}
                     <span>
-                        <RouterLink 
-                            to="/signup"
+                        <Link 
                             href='#'
                             variant="body2"
                             sx={{alignSelf: 'center'}}
                         >
                             Sign up
-                        </RouterLink>
+                        </Link>
                     </span>
                 </Typography>
             </Box>
@@ -172,7 +139,6 @@ export default function Login() {
                     variant='outlined'
                     startIcon={<FacebookIcon/>}
                     fullWidth
-                    onClick={handleFacebookLogin}
                 >
                     Sign with Facebook
                 </Button>
